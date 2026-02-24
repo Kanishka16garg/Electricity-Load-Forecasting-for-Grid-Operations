@@ -1,0 +1,57 @@
+---
+config:
+  theme: neo-dark
+---
+flowchart TB
+subgraph USER["👤 USER FLOW (Grid Operator / Analyst)"]
+    direction TB
+        U1(("Start"))
+        U2["Open Web Dashboard"]
+        U3{"New or Existing User?"}
+        
+        U4_NEW["Sign Up"]
+        U5_NEW["Enter Details & Create Account"]
+        
+        U4_EXIST["Login"]
+        U5_EXIST["Enter Credentials"]
+        
+        U6["Dashboard Home"]
+        U7["Select Meter ID"]
+        U8["Select Forecast Horizon (e.g. 24 hrs)"]
+        U9["View Historical Load Graph"]
+        U10["Click Generate Forecast"]
+end
+subgraph SYSTEM["⚙️ SYSTEM FLOW (Backend + ML Pipeline)"]
+    direction TB
+        S1["Fetch Data from PostgreSQL"]
+        S2["Preprocessing (Missing Values, Resampling)"]
+        S3["Load / Train ARIMA Model"]
+        S4["Generate Forecast"]
+        S5["Store Forecast in Database"]
+        S6["Return Results via API"]
+end
+subgraph VISUAL["📊 VISUALIZATION & INSIGHTS"]
+    direction TB
+        V1["Display Forecast vs Historical Graph"]
+        V2["Show Metrics (MAE, sMAPE)"]
+        V3["Download / Export Results"]
+        V4["View Trends Over Time"]
+end
+subgraph RETRAIN["🔁 MODEL RETRAINING FLOW"]
+    direction TB
+        R1["User Clicks Retrain Model"]
+        R2["Fetch Updated Data"]
+        R3["Retrain ARIMA Model"]
+        R4["Update Model in System"]
+        R5["Show Updated Performance"]
+end
+U1 --> U2
+U2 --> U3
+U3 -- New --> U4_NEW --> U5_NEW --> U6
+U3 -- Existing --> U4_EXIST --> U5_EXIST --> U6
+U6 --> U7 --> U8 --> U9 --> U10
+U10 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6
+S6 --> V1 --> V2 --> V4
+V2 --> V3
+V2 --> R1
+R1 --> R2 --> R3 --> R4 --> R5 --> U6
