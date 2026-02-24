@@ -1,0 +1,55 @@
+---
+config:
+  theme: neo-dark
+---
+flowchart TB
+subgraph CLIENT_LAYER["Client Layer"]
+    USER["Web Dashboard (Operator / Analyst)"]
+end
+API["API Layer (FastAPI REST APIs)"]
+
+USER --> API
+subgraph BACKEND_SERVICES["Backend Services"]
+    AUTH["Authentication Service (JWT Role Based)"]
+    DATA_SERVICE["Data Service (Upload & Meter Data)"]
+    FORECAST_SERVICE["Forecast Service"]
+    MODEL_SERVICE["Model Training & Retraining Service"]
+    ANALYTICS_SERVICE["Analytics & Visualization Service"]
+    BATCH_SERVICE["Batch Forecast Service"]
+end
+
+API --> AUTH
+API --> DATA_SERVICE
+API --> FORECAST_SERVICE
+API --> MODEL_SERVICE
+API --> ANALYTICS_SERVICE
+API --> BATCH_SERVICE
+subgraph DATA_LAYER["Data Layer"]
+    POSTGRES["PostgreSQL (Load Data, Models, Forecasts, Metrics)"]
+end
+
+DATA_SERVICE --> POSTGRES
+FORECAST_SERVICE --> POSTGRES
+MODEL_SERVICE --> POSTGRES
+ANALYTICS_SERVICE --> POSTGRES
+BATCH_SERVICE --> POSTGRES
+subgraph ML_LAYER["ML Layer"]
+    PREPROCESS["Preprocessing Pipeline (Cleaning, Resampling, Missing Values)"]
+    MODEL["ARIMA Model (statsmodels)"]
+end
+
+FORECAST_SERVICE --> PREPROCESS
+PREPROCESS --> MODEL
+MODEL --> FORECAST_SERVICE
+
+MODEL_SERVICE --> PREPROCESS
+MODEL_SERVICE --> MODEL
+BATCH_SERVICE --> PREPROCESS
+PREPROCESS --> BATCH_SERVICE
+subgraph DEPLOYMENT["Deployment Infrastructure"]
+    DOCKER["Docker Container"]
+    EC2["AWS EC2 Deployment"]
+end
+
+API --> DOCKER
+DOCKER --> EC2
